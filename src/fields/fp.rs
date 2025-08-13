@@ -116,15 +116,19 @@ macro_rules! field_impl {
                 #[cfg(feature = "std")]
                 println!("cycle-tracker-report-start: compute-inverse");
                 if self.is_zero() {
-                    None
+                    let out = None;
+                    #[cfg(feature = "std")]
+                    println!("cycle-tracker-report-end: compute-inverse");
+                    out
                 } else {
                     self.0.invert(&U256::from($modulus));
                     self.0.mul(&U256::from($rcubed), &U256::from($modulus), $inv);
 
-                    Some(self)
+                    let out =Some(self);
+                    #[cfg(feature = "std")]
+                    println!("cycle-tracker-report-end: compute-inverse");
+                    out
                 }
-                #[cfg(feature = "std")]
-                println!("cycle-tracker-report-end: compute-inverse");
             }
         }
 
