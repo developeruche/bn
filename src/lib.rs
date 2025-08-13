@@ -3,7 +3,7 @@
 extern crate alloc;
 
 pub mod arith;
-mod fields;
+pub mod fields;
 mod groups;
 
 use crate::fields::FieldElement;

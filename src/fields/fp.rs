@@ -3,6 +3,12 @@ use core::ops::{Add, Mul, Neg, Sub};
 use rand::Rng;
 use crate::fields::FieldElement;
 use crate::arith::{U256, U512};
+use core::sync::atomic::{AtomicUsize, Ordering};
+
+pub static SUBBN_ADD_COUNT: AtomicUsize = AtomicUsize::new(0);
+pub static SUBBN_SUB_COUNT: AtomicUsize = AtomicUsize::new(0);
+pub static SUBBN_MUL_COUNT: AtomicUsize = AtomicUsize::new(0);
+pub static SUBBN_INV_COUNT: AtomicUsize = AtomicUsize::new(0);
 
 macro_rules! field_impl {
     ($name:ident, $modulus:expr, $rsquared:expr, $rcubed:expr, $one:expr, $inv:expr) => {
@@ -106,6 +112,7 @@ macro_rules! field_impl {
             }
 
             fn inverse(mut self) -> Option<Self> {
+                SUBBN_INV_COUNT.fetch_add(1, Ordering::Relaxed);
                 if self.is_zero() {
                     None
                 } else {
@@ -122,6 +129,7 @@ macro_rules! field_impl {
 
             #[inline]
             fn add(mut self, other: $name) -> $name {
+                SUBBN_ADD_COUNT.fetch_add(1, Ordering::Relaxed);
                 self.0.add(&other.0, &U256::from($modulus));
 
                 self
@@ -133,6 +141,7 @@ macro_rules! field_impl {
 
             #[inline]
             fn sub(mut self, other: $name) -> $name {
+                SUBBN_SUB_COUNT.fetch_add(1, Ordering::Relaxed);
                 self.0.sub(&other.0, &U256::from($modulus));
 
                 self
@@ -144,6 +153,7 @@ macro_rules! field_impl {
 
             #[inline]
             fn mul(mut self, other: $name) -> $name {
+                SUBBN_MUL_COUNT.fetch_add(1, Ordering::Relaxed);
                 self.0.mul(&other.0, &U256::from($modulus), $inv);
 
                 self
