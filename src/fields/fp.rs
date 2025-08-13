@@ -113,6 +113,8 @@ macro_rules! field_impl {
 
             fn inverse(mut self) -> Option<Self> {
                 SUBBN_INV_COUNT.fetch_add(1, Ordering::Relaxed);
+                #[cfg(feature = "std")]
+                println!("cycle-tracker-report-start: compute-inverse");
                 if self.is_zero() {
                     None
                 } else {
@@ -121,6 +123,8 @@ macro_rules! field_impl {
 
                     Some(self)
                 }
+                #[cfg(feature = "std")]
+                println!("cycle-tracker-report-end: compute-inverse");
             }
         }
 
@@ -130,7 +134,11 @@ macro_rules! field_impl {
             #[inline]
             fn add(mut self, other: $name) -> $name {
                 SUBBN_ADD_COUNT.fetch_add(1, Ordering::Relaxed);
+                #[cfg(feature = "std")]
+                println!("cycle-tracker-report-start: compute-add");
                 self.0.add(&other.0, &U256::from($modulus));
+                #[cfg(feature = "std")]
+                println!("cycle-tracker-report-end: compute-add");
 
                 self
             }
@@ -142,7 +150,11 @@ macro_rules! field_impl {
             #[inline]
             fn sub(mut self, other: $name) -> $name {
                 SUBBN_SUB_COUNT.fetch_add(1, Ordering::Relaxed);
+                #[cfg(feature = "std")]
+                println!("cycle-tracker-report-start: compute-sub");
                 self.0.sub(&other.0, &U256::from($modulus));
+                #[cfg(feature = "std")]
+                println!("cycle-tracker-report-end: compute-sub");
 
                 self
             }
@@ -154,7 +166,11 @@ macro_rules! field_impl {
             #[inline]
             fn mul(mut self, other: $name) -> $name {
                 SUBBN_MUL_COUNT.fetch_add(1, Ordering::Relaxed);
+                #[cfg(feature = "std")]
+                println!("cycle-tracker-report-start: compute-mul");
                 self.0.mul(&other.0, &U256::from($modulus), $inv);
+                #[cfg(feature = "std")]
+                println!("cycle-tracker-report-end: compute-mul");
 
                 self
             }
